@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 const C = {
-  bg:"#111214", surface:"#1A1B1E", card:"#222428", cardAlt:"#2A2B30",
+  bg:"#000000", surface:"#111214", card:"#1A1B1E", cardAlt:"#222428",
   border:"#2E3035", accent:"#F5C842", accentGlow:"#F5C84230",
   red:"#FF4D4D", green:"#3DD68C", blue:"#4A9EFF",
   orange:"#FB923C", purple:"#C084FC",
@@ -184,7 +184,7 @@ function SplashScreen({ onDone }) {
     setTimeout(() => setVis(true), 80);
     setTimeout(() => setVis(false), 1900);
     setTimeout(onDone, 2400);
-  }, []);
+  }, [onDone]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <div style={{ position:"fixed", inset:0, background:C.bg, zIndex:999, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:20, transition:"opacity 0.5s", opacity:vis?1:0 }}>
       <div style={{ width:96, height:96, borderRadius:28, background:C.accent, display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 0 60px "+C.accentGlow, transform:vis?"scale(1)":"scale(0.8)", transition:"transform 0.5s cubic-bezier(0.34,1.56,0.64,1)" }}>
