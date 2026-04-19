@@ -180,6 +180,12 @@ function ShareModal({ text, title, onClose }) {
               <span style={{ fontSize:15, fontWeight:800, color:C.bg }}>Send via Messages</span>
             </div>
           </a>
+          <a href={"mailto:?subject="+encodeURIComponent(title)+"&body="+encodeURIComponent(text)} style={{ textDecoration:"none" }}>
+            <div style={{ width:"100%", padding:"16px", borderRadius:14, background:C.accent, display:"flex", alignItems:"center", justifyContent:"center", gap:10, cursor:"pointer", boxSizing:"border-box" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.bg} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              <span style={{ fontSize:15, fontWeight:800, color:C.bg }}>Send via Email</span>
+            </div>
+          </a>
           <button onClick={copy} style={{ width:"100%", padding:"16px", borderRadius:14, background:copied?C.green:C.blue, border:"none", color:copied?C.bg:C.text, fontSize:15, fontWeight:800, cursor:"pointer", transition:"background 0.2s" }}>
             {copied ? "Copied!" : "Copy to Clipboard"}
           </button>
@@ -1500,16 +1506,14 @@ export default function App() {
 
   const setPlayer = (p) => { setPlayerState(p); savePlayer(p); };
 
-  // eslint-disable-next-line no-unused-vars
-  const setFixtures = (fn) => {
+  const setFixtures = (fn) => { // eslint-disable-line no-unused-vars
     setFixturesState(prev => {
       const next = typeof fn === "function" ? fn(prev) : fn;
       return next;
     });
   };
 
-  // eslint-disable-next-line no-unused-vars
-  const setGameHistory = (fn) => {
+  const setGameHistory = (fn) => { // eslint-disable-line no-unused-vars
     setGameHistoryState(prev => {
       const next = typeof fn === "function" ? fn(prev) : fn;
       return next;
