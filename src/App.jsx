@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, deleteDoc, updateDoc } from "firebase/firestore";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCs0JraHpPTqlQiUYC0PGwrPdkcCBvasmU",
@@ -1500,6 +1500,7 @@ export default function App() {
 
   const setPlayer = (p) => { setPlayerState(p); savePlayer(p); };
 
+  // eslint-disable-next-line no-unused-vars
   const setFixtures = (fn) => {
     setFixturesState(prev => {
       const next = typeof fn === "function" ? fn(prev) : fn;
@@ -1507,6 +1508,7 @@ export default function App() {
     });
   };
 
+  // eslint-disable-next-line no-unused-vars
   const setGameHistory = (fn) => {
     setGameHistoryState(prev => {
       const next = typeof fn === "function" ? fn(prev) : fn;
