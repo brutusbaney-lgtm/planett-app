@@ -104,7 +104,7 @@ function BottomNav({ active, onNav }) {
     { id:"stats", label:"Stats" },
   ];
   return (
-    <div style={{ display:"flex", borderTop:"1px solid "+C.border, background:C.surface, paddingBottom:16, paddingTop:8, flexShrink:0 }}>
+    <div style={{ display:"flex", borderTop:"1px solid "+C.border, background:C.surface, paddingBottom:"calc(16px + env(safe-area-inset-bottom))", paddingTop:8, flexShrink:0 }}>
       {tabs.map(tab => {
         const on = active === tab.id;
         return (
