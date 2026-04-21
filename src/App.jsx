@@ -99,7 +99,7 @@ function BottomNav({ active, onNav }) {
   const tabs = [
     { id:"home", label:"Home" },
     { id:"profile", label:"Profile" },
-    { id:"eval", label:"Eval" },
+    { id:"eval", label:"Game" },
     { id:"fixtures", label:"Fixtures" },
     { id:"stats", label:"Stats" },
   ];
