@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCs0JraHpPTqlQiUYC0PGwrPdkcCBvasmU",
@@ -907,7 +907,7 @@ function EvalScreen({ player, fixtures, onGameSaved }) {
 // ══════════════════════════════════════════════════════════════════════════════
 // GAME DETAIL
 // ══════════════════════════════════════════════════════════════════════════════
-function GameDetailScreen({ fixture, gameHistory, player, onBack }) {
+function GameDetailScreen({ fixture, gameHistory, player, onBack, onDelete }) {
   const [shareModal, setShareModal] = useState(false);
   // Find recorded game matching this fixture
   const game = gameHistory.find(g => g.fixtureId === fixture.id) || null;
@@ -1038,6 +1038,12 @@ function GameDetailScreen({ fixture, gameHistory, player, onBack }) {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
                 Share Stats Sheet
               </button>
+              {onDelete && game && (
+                <button onClick={() => { if(window.confirm("Delete this game record? This cannot be undone.")) onDelete(game, fixture); }} style={{ width:"100%", padding:"16px", marginTop:8, borderRadius:14, background:"transparent", border:"1.5px solid "+C.red+"66", color:C.red, fontSize:15, fontWeight:800, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:10 }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                  Delete Game Record
+                </button>
+              )}
             </>
           ) : (
             <div style={{ textAlign:"center", padding:"32px 20px", color:C.muted }}>
@@ -1056,11 +1062,11 @@ function GameDetailScreen({ fixture, gameHistory, player, onBack }) {
 // ══════════════════════════════════════════════════════════════════════════════
 // FIXTURES
 // ══════════════════════════════════════════════════════════════════════════════
-function FixturesScreen({ fixtures, gameHistory, player, onBuildFixture }) {
+function FixturesScreen({ fixtures, gameHistory, player, onBuildFixture, onDeleteGame }) {
   const [selected, setSelected] = useState(null);
 
   if (selected) {
-    return <GameDetailScreen fixture={selected} gameHistory={gameHistory} player={player} onBack={() => setSelected(null)}/>;
+    return <GameDetailScreen fixture={selected} gameHistory={gameHistory} player={player} onBack={() => setSelected(null)} onDelete={onDeleteGame}/>;
   }
 
   const upcoming  = fixtures.filter(f => f.status === "upcoming");
@@ -1558,6 +1564,20 @@ export default function App() {
     }
   };
 
+  const handleDeleteGame = async (game, fixture) => {
+    // Remove from gameHistory state
+    setGameHistoryState(prev => prev.filter(g => g !== game && g.id !== game.id));
+    // Reset fixture to upcoming
+    setFixturesState(prev => prev.map(f => f.id === fixture.id ? { ...f, status:"upcoming" } : f));
+    // Delete from Firestore
+    if (user && game.id) {
+      try { await deleteDoc(doc(db, "users", user.uid, "gameHistory", game.id)); } catch(e){}
+    }
+    if (user && fixture.id) {
+      try { await updateDoc(doc(db, "users", user.uid, "fixtures", fixture.id), { status:"upcoming" }); } catch(e){}
+    }
+  };
+
   const shell = (children, showNav=true) => (
     <div style={{ fontFamily:"'DM Sans', sans-serif", background:C.bg, height:"100vh", color:C.text, display:"flex", flexDirection:"column", maxWidth:430, margin:"0 auto", overflow:"hidden" }}>
       {children}
@@ -1592,7 +1612,7 @@ export default function App() {
       case "home":     return <HomeScreen player={player} fixtures={fixtures} gameHistory={gameHistory} onNavigate={navigate}/>;
       case "profile":  return <ProfileScreen player={player} gameHistory={gameHistory} onEdit={() => setEditingPlayer(true)}/>;
       case "eval":     return <EvalScreen player={player} fixtures={fixtures} onGameSaved={handleGameSaved}/>;
-      case "fixtures": return <FixturesScreen fixtures={fixtures} gameHistory={gameHistory} player={player} onBuildFixture={() => setScreen("buildFixture")}/>;
+      case "fixtures": return <FixturesScreen fixtures={fixtures} gameHistory={gameHistory} player={player} onBuildFixture={() => setScreen("buildFixture")} onDeleteGame={handleDeleteGame}/>;
       case "stats":    return <StatisticsScreen player={player} gameHistory={gameHistory}/>;
       default:         return <HomeScreen player={player} fixtures={fixtures} gameHistory={gameHistory} onNavigate={navigate}/>;
     }
